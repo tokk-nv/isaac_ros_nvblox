@@ -180,7 +180,7 @@ export DISPLAY=192.168.1.11:10.0
                       └──────────┘
 ```
 
-### Update RealSense firmware
+### RealSense Camera Firmware Update
 
 > Based on [RealSense online documentaiton](https://dev.intelrealsense.com/docs/firmware-update-tool).
 
@@ -226,4 +226,82 @@ If it shows something like following, exit and restart the container to run `rs-
 Firmware update done
 Waiting for new device...
 ... timed out!
+```
+
+### Host System Setup
+
+On Jetson natively (not inside the container), issue the followings.
+
+```bash
+echo -e "net.core.rmem_max=8388608\nnet.core.rmem_default=8388608\n" | sudo tee /etc/sysctl.d/60-cyclonedds.conf
+sudo sysctl -w net.core.rmem_max=8388608 net.core.rmem_default=8388608
+
+```
+
+### Installing the Dependencies
+
+As instructed in [the original documentation](https://github.com/tokk-nv/isaac_ros_nvblox/blob/docs/docs/tutorial-nvblox-vslam-realsense.md#installing-the-dependencies).
+
+
+### Running the Example as is on Jetson
+
+#### SSH on Jetson
+
+Inside the container, after buildling and sourcing the workspace, run the original launch file.
+
+```bash
+source /workspaces/isaac_ros-dev/install/setup.bash
+ros2 launch nvblox_examples_bringup nvblox_vslam_realsense.launch.py
+```
+
+RViz2 runs on Jetson and X11 window gets forwarded to your PC screen.
+
+![](../resources/nvblox-vlasm-Rviz-on-Jetson.png)
+
+### Running the Example with PC for RViz
+
+#### SSH on Jetson
+
+Modify the launch file.
+
+```bash
+cd /workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_examples_bringup/launch/
+cp nvblox_vslam_realsense.launch.py nvblox_vslam_realsense_without_rviz.launch.py
+vi nvblox_vslam_realsense_without_rviz.launch.py
+```
+
+```bash
+cd /workspaces/isaac_ros-dev && \
+  colcon build --symlink-install && \
+  source install/setup.bash
+source /workspaces/isaac_ros-dev/install/setup.bash
+ros2 launch nvblox_examples_bringup nvblox_vslam_realsense_without_rviz.launch.py
+```
+
+Inside the container, after buildling and sourcing the workspace, run the original launch file.
+
+#### On PC
+
+Complete the [setup for PC](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md).
+
+Create a new launch file to just launch RViz for nvblox (and vslam).
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_examples_bringup/launch/
+cp nvblox_vslam_realsense.launch.py rviz_for_nvblox_vslam.launch.py
+vi rviz_for_nvblox_vslam.launch.py
+```
+
+Launch the container, to launch RViz.
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+  ./scripts/run_dev.sh
+cd /workspaces/isaac_ros-dev/ && \
+    rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
+cd /workspaces/isaac_ros-dev && \
+  colcon build --symlink-install && \
+  source install/setup.bash
+source /workspaces/isaac_ros-dev/install/setup.bash
+ros2 launch nvblox_examples_bringup rviz_for_nvblox_vslam.launch.py
 ```
