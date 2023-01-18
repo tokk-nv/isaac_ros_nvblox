@@ -3,31 +3,37 @@
 This tutorial demosntrates how to setup a Jetson developer kit mounted on a robot with a Realsense camera with a separate PC for remote command and visualization.
 
 > Note: This tutorial has been tested with the following combinations.
-> | Jetson | Robot | PC | Check status |
-> |:--|:--|:--|:--|
-> | AGX Orin Developer Kit | Create 3 | x86 desktop with Volta GPU | ⚠️ |
-> | Xavier NX Developer Kit | Create 3 | x86 laptop with Maxwell GPU | ⚠️✅ |
+> | Jetson | RealSense | Robot | PC | Check status |
+> |:--|:--|:--|:--|:--|
+> | AGX Orin Developer Kit | D435I | Create 3 | x86 desktop with Volta GPU | ⚠️ |
+> | Xavier NX Developer Kit | D435I | Create 3 | x86 laptop with Maxwell GPU | ⚠️✅ |
 
 ## [1] RealSense setup with Jetson on a Robot
 
 ### Machines Setup
 
 ```
-                                           Internet
-                                               ▲
-                                               │
-                                         ┌─────┴────┐
-                               Wi-Fi     │ Wireless │   Wi-Fi/Ethernet
-                               ┌───────► │  router  │ ◄──────┐
-                               │         └──────────┘        │
-                               │                             │
-                               │ 192.168.1.10                │ 192.168.1.11
-                               ▼                             ▼
- ┌──────────┐              ┌────────┐                     ┌───────┐
- │ Create 3 │◄────────────►│ Jetson │                     │  PC   │
- └──────────┘   Ethernet   └────────┘                     └───────┘
-                over USB                                 /       /
-                                                        ─────────
+                                       Internet
+                                           ▲
+                                           │
+                                     ┌─────┴────┐
+                           Wi-Fi     │ Wireless │   Wi-Fi/Ethernet
+                           ┌───────► │  router  │ ◄──────┐
+                           │         └──────────┘        │
+                           │                             │
+                           │                             │
+                           ▼ 192.168.1.10                ▼ 192.168.1.11
+ ┌───────────┐   USB   ┌────────┐                     ┌───────┐
+ │ RealSense ├─────────┤ Jetson │                     │  PC   │
+ └───────────┘         └────────┘                     └───────┘
+                           ▲                         /       /
+                 Ethernet  │                        ─────────
+                 over USB  │
+                           ▼
+                      ┌──────────┐
+                      │ Create 3 │
+                      └──────────┘
+
 ```
 
 ### Initial setup 
@@ -147,3 +153,77 @@ export DISPLAY=192.168.1.11:10.0
 
 > This is based on [Tutorial For RealSense-based Reconstruction](./tutorial-nvblox-vslam-realsense.md)
 
+### Machines Setup
+
+> Essentially same as above ([1])
+
+```
+                                       Internet
+                                           ▲
+                                           │
+                                     ┌─────┴────┐
+                           Wi-Fi     │ Wireless │   Wi-Fi/Ethernet
+                           ┌───────► │  router  │ ◄──────┐
+                           │         └──────────┘        │
+                           │                             │
+                           │                             │
+                           ▼ 192.168.1.10                ▼ 192.168.1.11
+ ┌───────────┐   USB   ┌────────┐                     ┌───────┐
+ │ RealSense ├─────────┤ Jetson │                     │  PC   │
+ └───────────┘         └────────┘                     └───────┘
+                           ▲ 192.168.186.3           /       /
+                 Ethernet  │                        ─────────
+                 over USB  │
+                           ▼ 192.168.186.2
+                      ┌──────────┐
+                      │ Create 3 │
+                      └──────────┘
+```
+
+### Update RealSense firmware
+
+> Based on [RealSense online documentaiton](https://dev.intelrealsense.com/docs/firmware-update-tool).
+
+On your Jetson connected to the RealSense, run the container to have access to the librealsense installed.
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && ./scripts/run_dev.sh
+```
+
+Once in the container, run the following to check.
+
+```bash
+rs-fw-update -l
+```
+
+You should get something like this.
+
+> ```bash
+> Connected devices:
+> 1) Name: Intel RealSense D435I, serial number: 140122076447, update serial number: 137623063958, firmware version: 05.12.07.150, USB type: 3.2
+> 
+> ```
+
+Download the specified version of the firmware and apply.<br>
+**Be sure to replace the S/N with of your own RealSense.**
+
+```bash
+wget https://www.intelrealsense.com/download/19295/?_ga=2.244073541.1768311857.1674071420-176555355.1674071420 -O Signed_Image_UVC_5_13_0_50.zip
+unzip Signed_Image_UVC_5_13_0_50.zip
+sudo su
+rs-fw-update -s 140122076447 -f D400_Series_FW_5_13_0_50/Signed_Image_UVC_5_13_0_50.bin
+```
+
+If it shows "`Device is in recovery mode, use -r to recover`", then issue the follwing.
+
+```bash
+rs-fw-update -r -f D400_Series_FW_5_13_0_50/Signed_Image_UVC_5_13_0_50.bin
+```
+
+If it shows something like following, exit and restart the container to run `rs-fw-update -l` to check the firmware version.
+
+```bash
+Firmware update done
+Waiting for new device...
+... timed out!
+```
