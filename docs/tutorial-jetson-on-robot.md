@@ -242,6 +242,17 @@ sudo sysctl -w net.core.rmem_max=8388608 net.core.rmem_default=8388608
 
 As instructed in [the original documentation](https://github.com/tokk-nv/isaac_ros_nvblox/blob/docs/docs/tutorial-nvblox-vslam-realsense.md#installing-the-dependencies).
 
+### Start the Container
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+  ./scripts/run_dev.sh
+cd /workspaces/isaac_ros-dev/ && \
+    rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
+cd /workspaces/isaac_ros-dev && \
+  colcon build --symlink-install && \
+  source install/setup.bash
+```
 
 ### Running the Example as is on Jetson
 
@@ -258,6 +269,8 @@ RViz2 runs on Jetson and X11 window gets forwarded to your PC screen.
 
 ![](../resources/nvblox-vlasm-Rviz-on-Jetson.png)
 
+Note that the GUI operation is slow, as the whole X11 window content is forwarded from Jetson to your PC.
+
 ### Running the Example with PC for RViz
 
 #### SSH on Jetson
@@ -270,6 +283,8 @@ cp nvblox_vslam_realsense.launch.py nvblox_vslam_realsense_without_rviz.launch.p
 vi nvblox_vslam_realsense_without_rviz.launch.py
 ```
 
+Inside the container, after buildling and sourcing the workspace, run the modified launch file.
+
 ```bash
 cd /workspaces/isaac_ros-dev && \
   colcon build --symlink-install && \
@@ -278,11 +293,33 @@ source /workspaces/isaac_ros-dev/install/setup.bash
 ros2 launch nvblox_examples_bringup nvblox_vslam_realsense_without_rviz.launch.py
 ```
 
-Inside the container, after buildling and sourcing the workspace, run the original launch file.
+#### Setup PC
 
-#### On PC
+Set up the workspaces directory on the PC just enough for the container to run RViz on the PC.
 
-Complete the [setup for PC](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md).
+First, go through the [Isaac ROS Development Environment Setup](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md).
+
+Then clone the `isaac_ros_common` and `isaac_ros_nvblox` repo on your PC workspace, and start the container.
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src
+git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common
+git clone --recurse-submodules https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox && \
+    cd isaac_ros_nvblox && git lfs pull
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+  ./scripts/run_dev.sh
+```
+
+```bash
+cd /workspaces/isaac_ros-dev/ && \
+    rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
+cd /workspaces/isaac_ros-dev && \
+  colcon build --symlink-install && \
+  source install/setup.bash
+source /workspaces/isaac_ros-dev/install/setup.bash
+```
+
+#### Run RViz on PC
 
 Create a new launch file to just launch RViz for nvblox (and vslam).
 
@@ -297,11 +334,21 @@ Launch the container, to launch RViz.
 ```bash
 cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
   ./scripts/run_dev.sh
+```
+
+Once inside the container, install package-specific dependencies, and build the workspace.
+
+```bash
 cd /workspaces/isaac_ros-dev/ && \
     rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
 cd /workspaces/isaac_ros-dev && \
   colcon build --symlink-install && \
   source install/setup.bash
 source /workspaces/isaac_ros-dev/install/setup.bash
+```
+
+Then run the new launch file.
+
+```bash
 ros2 launch nvblox_examples_bringup rviz_for_nvblox_vslam.launch.py
 ```
