@@ -254,7 +254,7 @@ cd /workspaces/isaac_ros-dev && \
   source install/setup.bash
 ```
 
-### Running the Example as is on Jetson
+### [2-a] Running the Example as is on Jetson
 
 #### SSH on Jetson
 
@@ -271,9 +271,16 @@ RViz2 runs on Jetson and X11 window gets forwarded to your PC screen.
 
 Note that the GUI operation is slow, as the whole X11 window content is forwarded from Jetson to your PC.
 
-### Running the Example with PC for RViz
+### [2-b] Running the Example with PC for RViz
 
 #### SSH on Jetson
+
+Launch the container.
+
+```bash
+cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+  ./scripts/run_dev.sh
+```
 
 Modify the launch file.
 
