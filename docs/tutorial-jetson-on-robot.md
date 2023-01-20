@@ -364,4 +364,4 @@ ros2 launch nvblox_examples_bringup rviz_for_nvblox_vslam.launch.py
 
 Screencast video:
 
-https://user-images.githubusercontent.com/25759564/213610512-5e36298d-061e-4aae-bb92-d485d0c94ae2.mp4
+https://user-images.githubusercontent.com/25759564/213618936-68556291-746c-40ef-b927-dc5635f54d78.mp4
