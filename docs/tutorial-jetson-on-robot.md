@@ -2,6 +2,8 @@
 
 ![](../resources/header-img_PC-and-Jetson-on-Create3.png)
 
+https://user-images.githubusercontent.com/25759564/213635510-e45b593d-89db-46ff-b01b-0c1c52de8ca2.mp4
+
 This tutorial demosntrates how to setup a Jetson developer kit mounted on a robot with a Realsense camera with a separate PC for remote command and visualization.
 
 > Note: This tutorial has been tested with the following combinations.
