@@ -2,7 +2,7 @@
 
 ![](../resources/header-img_PC-and-Jetson-on-Create3.png)
 
-https://user-images.githubusercontent.com/25759564/213635510-e45b593d-89db-46ff-b01b-0c1c52de8ca2.mp4
+https://user-images.githubusercontent.com/25759564/213640011-a24cbf97-6569-4d6e-a6fb-df83b64555ad.mp4
 
 This tutorial demosntrates how to setup a Jetson developer kit mounted on a robot with a Realsense camera with a separate PC for remote command and visualization.
 
@@ -366,4 +366,4 @@ ros2 launch nvblox_examples_bringup rviz_for_nvblox_vslam.launch.py
 
 Screencast video:
 
-https://user-images.githubusercontent.com/25759564/213635510-e45b593d-89db-46ff-b01b-0c1c52de8ca2.mp4
+https://user-images.githubusercontent.com/25759564/213640011-a24cbf97-6569-4d6e-a6fb-df83b64555ad.mp4
